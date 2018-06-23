@@ -5,7 +5,7 @@ const pokedex = new Pokedex();
 
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
-for (let i = 1; i <= 1; i++) {
+for (let i = 121; i <= 151; i++) {
   addPokemon(i);
 }
 
@@ -31,7 +31,6 @@ function addPokemon(id) {
         let data = response.data;
         newPokemon.baseStats = getBaseStats(data.stats);
         newPokemon.sprites = getSprites(data.sprites);
-        // newPokemon.moves = getMoves(data.moves);
         addPokemonToDatabase(newPokemon);
         console.log(newPokemon.name + ' added successfully!');
       });
@@ -74,9 +73,13 @@ function getValues(values) {
 }
 
 function getGenderRatio(ratio) {
-  return {
-    male: ratio[0],
-    female: ratio[1]
+  if (ratio.length > 0) {
+    return {
+      male: ratio[0],
+      female: ratio[1]
+    }
+  } else {
+    return 'genderless';
   }
 }
 

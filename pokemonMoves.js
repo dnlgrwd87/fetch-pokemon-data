@@ -1,7 +1,7 @@
 const db = require("./pokemon-firebase");
 const axios = require("axios");
 
-for (let i = 1; i <= 3; i++) {
+for (let i = 3; i <= 9; i++) {
   axios.get('https://pokeapi.co/api/v2/pokemon/' + i)
     .then(response => {
       let moves = response.data.moves;
