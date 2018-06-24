@@ -5,7 +5,7 @@ const pokedex = new Pokedex();
 
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
-for (let i = 1; i <= 49; i++) {
+for (let i = 251; i <= 251; i++) {
   addPokemon(i);
 }
 
@@ -95,24 +95,8 @@ function getAbilities(abilities) {
   return pokeAbilities;
 }
 
-function getMoves(moves) {
-  let movesList = {};
-  let count = 1;
-  moves.forEach(m => {
-    let moveName = m.move.name;
-    let versionDetails = m.version_group_details;
-    versionDetails.forEach(detail => {
-      let version = detail.version_group.name;
-      if (version == "sun-moon") {
-        movesList[moveName] = true;
-      }
-    });
-  });
-  return movesList;
-}
-
 function addPokemonToDatabase(pokemon) {
-  db.collection("pokemon").doc(pokemon.id.toString()).update({
-    weight: pokemon.weight
+  db.collection("pokemon").doc(pokemon.id.toString()).set(pokemon, {
+    merge: true
   })
 }
