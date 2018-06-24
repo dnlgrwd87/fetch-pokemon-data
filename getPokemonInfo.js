@@ -5,7 +5,7 @@ const pokedex = new Pokedex();
 
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
-for (let i = 121; i <= 151; i++) {
+for (let i = 1; i <= 49; i++) {
   addPokemon(i);
 }
 
@@ -22,6 +22,7 @@ function addPokemon(id) {
       newPokemon.species = data.species.toLowerCase();
       newPokemon.types = getValues(data.types);
       newPokemon.height = data.height;
+      newPokemon.weight = data.weight;
       newPokemon.generation = data.gen;
       newPokemon.genderRatio = getGenderRatio(data.gender);
       newPokemon.eggGroups = getValues(data.eggGroups);
@@ -111,5 +112,7 @@ function getMoves(moves) {
 }
 
 function addPokemonToDatabase(pokemon) {
-  db.collection("pokemon").doc(pokemon.id.toString()).set(pokemon)
+  db.collection("pokemon").doc(pokemon.id.toString()).update({
+    weight: pokemon.weight
+  })
 }
