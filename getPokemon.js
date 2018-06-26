@@ -5,7 +5,7 @@ const pokedex = new Pokedex();
 
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
-for (let i = 251; i <= 251; i++) {
+for (let i = 1; i <= 3; i++) {
   addPokemon(i);
 }
 
@@ -28,13 +28,19 @@ function addPokemon(id) {
       newPokemon.eggGroups = getValues(data.eggGroups);
       newPokemon.abilities = getAbilities(data.abilities);
 
-      axios.get('https://pokeapi.co/api/v2/pokemon/' + id).then(response => {
+      axios.get("https://pokeapi.co/api/v2/pokemon-species/" + id).then(response => {
         let data = response.data;
-        newPokemon.baseStats = getBaseStats(data.stats);
-        newPokemon.sprites = getSprites(data.sprites);
-        addPokemonToDatabase(newPokemon);
-        console.log(newPokemon.name + ' added successfully!');
-      });
+        let evoUrl = data.evolution_chain.url;
+        newPokemon.evolutionId = parseInt(evoUrl.slice(42, evoUrl.length - 1));
+
+        axios.get("https://pokeapi.co/api/v2/pokemon/" + id).then(response => {
+          let data = response.data;
+          newPokemon.baseStats = getBaseStats(data.stats);
+          newPokemon.sprites = getSprites(data.sprites);
+          addPokemonToDatabase(newPokemon);
+          console.log(newPokemon.name + " added successfully!");
+        });
+      })
     });
 }
 
@@ -42,7 +48,7 @@ function getBaseStats(stats) {
   let statsTotal = 0;
   stats.forEach(s => {
     statsTotal += s.base_stat;
-  })
+  });
   let statsInfo = {
     speed: stats[0].base_stat,
     specialDefense: stats[1].base_stat,
@@ -78,25 +84,31 @@ function getGenderRatio(ratio) {
     return {
       male: ratio[0],
       female: ratio[1]
-    }
+    };
   } else {
-    return 'genderless';
+    return "genderless";
   }
 }
 
 function getAbilities(abilities) {
   let pokeAbilities = {};
   let normal = abilities.normal.map(a => a.toLowerCase());
-  let hidden = abilities.hidden.map(a => a.toLowerCase());
-  normal.forEach(a => pokeAbilities[a] = true);
-  hidden.forEach(a => pokeAbilities[a] = true);
+  normal.forEach(a => (pokeAbilities[a] = true));
   pokeAbilities.normal = normal;
-  pokeAbilities.hidden = hidden;
+  if (abilities.hidden != "") {
+    let hidden = abilities.hidden.map(a => a.toLowerCase());
+    hidden.forEach(a => (pokeAbilities[a] = true));
+    pokeAbilities.hidden = hidden;
+  } else {
+    pokeAbilities.hidden = [];
+  }
   return pokeAbilities;
 }
 
 function addPokemonToDatabase(pokemon) {
-  db.collection("pokemon").doc(pokemon.id.toString()).set(pokemon, {
-    merge: true
-  })
+  db.collection("pokemon")
+    .doc(pokemon.id.toString())
+    .set(pokemon, {
+      merge: true
+    });
 }

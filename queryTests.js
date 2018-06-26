@@ -1,10 +1,12 @@
 const db = require("./pokemon-firebase");
 
-db.collection("pokemonMoves")
-  .doc("6")
-  .get()
-  .then(doc => {
+let url = 'https://pokeapi.co/api/v2/evolution-chain/1/';
 
-    console.log(doc.data()['52'])
 
-  });
+db.collection('pokemon').get().then(snapshot => {
+  snapshot.docs.forEach(doc => {
+    db.collection('pokemon').doc(doc.id).update({
+      newProp: 'new property!'
+    })
+  })
+})

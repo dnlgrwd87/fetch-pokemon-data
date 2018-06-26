@@ -9,7 +9,7 @@ let movesRef = db.collection('moves');
 let movesPokeRef = db.collection('movesPokemon');
 let pokemon = {};
 
-let moveId = '14';
+let moveId = '402';
 // go through pokeMoves
 pokeMovesRef.get().then(snap => {
   snap.docs.forEach(doc => {
