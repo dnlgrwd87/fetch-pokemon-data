@@ -1,12 +1,16 @@
 const db = require("./pokemon-firebase");
 const axios = require("axios");
-const Pokedex = require("pokedex-promise-v2");
-const pokedex = new Pokedex();
 
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
-for (let i = 1; i <= 3; i++) {
-  addPokemon(i);
+
+// current, up to 386 (deoxys)
+for (let i = 1; i <= 386; i++) {
+  db.collection('pokemon').doc(i.toString()).get().then(doc => {
+    if (!doc.exists)
+    console.log("pokemon with id " + i + " is missing, adding now");
+      addPokemon(i);
+  })
 }
 
 function addPokemon(id) {
@@ -32,13 +36,15 @@ function addPokemon(id) {
         let data = response.data;
         let evoUrl = data.evolution_chain.url;
         newPokemon.evolutionId = parseInt(evoUrl.slice(42, evoUrl.length - 1));
+        newPokemon.alternateForms = data.varieties.length > 1;
 
         axios.get("https://pokeapi.co/api/v2/pokemon/" + id).then(response => {
           let data = response.data;
           newPokemon.baseStats = getBaseStats(data.stats);
           newPokemon.sprites = getSprites(data.sprites);
           addPokemonToDatabase(newPokemon);
-          console.log(newPokemon.name + " added successfully!");
+          console.log('#' + newPokemon.id + " " + newPokemon.name + " added successfully!");
+          if (id == 0) console.log('done!');
         });
       })
     });
@@ -64,10 +70,8 @@ function getBaseStats(stats) {
 
 function getSprites(sprites) {
   return {
-    male: sprites.front_default,
-    female: sprites.front_female,
-    maleShiny: sprites.front_shiny,
-    femaleShiny: sprites.front_shiny_female
+    normal: sprites.front_default,
+    shiny: sprites.front_shiny,
   };
 }
 
@@ -108,7 +112,5 @@ function getAbilities(abilities) {
 function addPokemonToDatabase(pokemon) {
   db.collection("pokemon")
     .doc(pokemon.id.toString())
-    .set(pokemon, {
-      merge: true
-    });
+    .set(pokemon);
 }
