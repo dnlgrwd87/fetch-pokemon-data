@@ -2,9 +2,13 @@ const db = require("./pokemon-firebase");
 const axios = require("axios");
 
 
-// range is [1, 719] and [10001, 10018]
-for (let i = 10001; i <= 10018; i++) {
-  getMove(i);
+// range is [1, 719]
+for (let i = 601; i <= 719; i++) {
+  db.collection("moves").doc(i.toString()).get().then(doc => {
+    if (!doc.exists) {
+      getMove(i);
+    }
+  })
 }
 
 function getMove(i) {

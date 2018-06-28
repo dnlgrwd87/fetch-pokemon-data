@@ -1,8 +1,16 @@
 const db = require("./pokemon-firebase");
 const axios = require("axios");
-const firebase = require("firebase");
 
-for (let i = 257; i <= 257; i++) {
+for (let i = 151; i <= 210; i++) {
+
+  db.collection("pokemonMoves").doc(i.toString()).get().then(doc => {
+    // if (!doc.exists) {
+      getMove(i);
+    // }
+  })
+}
+
+function getMove(i) {
   axios.get("https://pokeapi.co/api/v2/pokemon/" + i).then(response => {
     let moves = response.data.moves;
     moves.forEach(move => {
