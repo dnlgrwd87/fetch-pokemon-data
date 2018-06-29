@@ -1,25 +1,30 @@
 const db = require("./pokemon-firebase");
+const axios = require("axios");
 
-/**
- * CAREFUL USING THIS A LOT, IT ADDS TO DAILY LIMIT FOR FIRESTORE OPERATIONS
- */
 
-// db.collection('pokemon').get().then(snapshot => {
-//   console.log('All pokemon: ' + snapshot.size);
-// })
+// IGNORE 29 TO 34
+for (let i = 326; i <= 386; i++) {
 
-// db.collection('pokemonMoves').get().then(snapshot => {
-//   console.log('Pokemon with moves stored: ' + snapshot.size);
-// })
+  axios.get("https://pokeapi.bastionbot.org/v1/pokemon/" + i).then(response => {
+    let data = response.data[0];
+    let name = data.name;
+    let evolutionLine = data.family.evolutionLine;
 
-// db.collection('pokemonShort').get().then(snapshot => {
-//   console.log('Pokemon condensed: ' + snapshot.size);
-// })
-
-// db.collection('moves').get().then(snapshot => {
-//   console.log('All moves: ' + snapshot.size);
-// })
-
-// db.collection('alternateForms').get().then(snapshot => {
-//   console.log('Alternate forms: ' + snapshot.size);
-// })
+    if (evolutionLine.indexOf(name) > 0) {
+      let baseForm = evolutionLine[0];
+      axios.get("https://pokeapi.bastionbot.org/v1/pokemon/" + baseForm).then(response => {
+        let data = response.data[0];
+        let baseFormId = parseInt(data.number);
+        db.collection('pokemon').doc(i.toString()).update({
+          baseId: baseFormId
+        })
+        console.log('base form updated')
+      })
+    } else {
+      db.collection('pokemon').doc(i.toString()).update({
+        baseId: null
+      })
+      console.log('base form set to null');
+    }
+  })
+}

@@ -31,6 +31,11 @@ function addPokemon(id) {
       newPokemon.genderRatio = getGenderRatio(data.gender);
       newPokemon.eggGroups = getValues(data.eggGroups);
       newPokemon.abilities = getAbilities(data.abilities);
+      if (data.family.evolutionLine.length > 1) {
+        newPokemon.baseId = data.family.evolutionLine[0];
+      } else {
+        newPokemon.baseId = null;
+      }
 
       axios.get("https://pokeapi.co/api/v2/pokemon-species/" + id).then(response => {
         let data = response.data;

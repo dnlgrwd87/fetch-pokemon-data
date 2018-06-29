@@ -35,5 +35,4 @@ function addFormsToDatabase(forms, id) {
       }
     })
   })
-
 }
