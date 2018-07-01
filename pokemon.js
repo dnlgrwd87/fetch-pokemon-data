@@ -4,12 +4,11 @@ const axios = require("axios");
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
 
-// current, up to 386 (deoxys)
-for (let i = 1; i <= 386; i++) {
+for (let i = 1; i <= 20; i++) {
   db.collection('pokemon').doc(i.toString()).get().then(doc => {
-    if (!doc.exists)
-    console.log("pokemon with id " + i + " is missing, adding now");
-      addPokemon(i);
+    if (!doc.exists) {
+    addPokemon(i);
+    }
   })
 }
 
@@ -20,8 +19,6 @@ function addPokemon(id) {
     .get("https://pokeapi.bastionbot.org/v1/pokemon/" + id)
     .then(response => {
       let data = response.data[0];
-
-      newPokemon.name = data.name.toLowerCase();
       newPokemon.id = id;
       newPokemon.species = data.species.toLowerCase();
       newPokemon.types = getValues(data.types);
@@ -31,16 +28,28 @@ function addPokemon(id) {
       newPokemon.genderRatio = getGenderRatio(data.gender);
       newPokemon.eggGroups = getValues(data.eggGroups);
       newPokemon.abilities = getAbilities(data.abilities);
-      if (data.family.evolutionLine.length > 1) {
-        newPokemon.baseId = data.family.evolutionLine[0];
-      } else {
-        newPokemon.baseId = null;
-      }
+      newPokemon.evolutionId = null;
+      newPokemon.baseId = null;
 
       axios.get("https://pokeapi.co/api/v2/pokemon-species/" + id).then(response => {
         let data = response.data;
         let evoUrl = data.evolution_chain.url;
-        newPokemon.evolutionId = parseInt(evoUrl.slice(42, evoUrl.length - 1));
+        let evoId = evoUrl.slice(42, evoUrl.length - 1);
+        newPokemon.name = data.name;
+
+        axios.get("https://pokeapi.co/api/v2/evolution-chain/" + evoId).then(response => {
+          let data = response.data;
+          if (data.chain.evolves_to.length > 0) {
+
+            newPokemon.evolutionId = data.id;
+            if (data.chain.species.name != newPokemon.name) {
+              let baseId = parseInt(
+                data.chain.species.url.slice(42, data.chain.species.url.length - 1)
+              );
+              newPokemon.baseId = baseId;
+            }
+          }
+        })
         newPokemon.alternateForms = data.varieties.length > 1;
 
         axios.get("https://pokeapi.co/api/v2/pokemon/" + id).then(response => {
@@ -49,7 +58,6 @@ function addPokemon(id) {
           newPokemon.sprites = getSprites(data.sprites);
           addPokemonToDatabase(newPokemon);
           console.log('#' + newPokemon.id + " " + newPokemon.name + " added successfully!");
-          if (id == 0) console.log('done!');
         });
       })
     });

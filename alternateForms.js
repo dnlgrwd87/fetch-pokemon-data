@@ -4,8 +4,13 @@ const axios = require("axios");
 
 db.collection('pokemon').where('alternateForms', '==', true).get().then(snapshot => {
   snapshot.docs.forEach(doc => {
-    axios.get("https://pokeapi.co/api/v2/pokemon-species/" + doc.id).then(response => {
-      addFormsToDatabase(response.data.varieties, doc.id);
+
+    db.collection('alternateForms').doc(doc.id).get().then(doc => {
+      if (!doc.exists) {
+        axios.get("https://pokeapi.co/api/v2/pokemon-species/" + doc.id).then(response => {
+          addFormsToDatabase(response.data.varieties, doc.id);
+        })
+      }
     })
   })
 })
@@ -21,18 +26,17 @@ function addFormsToDatabase(forms, id) {
     if (form.pokemon.name.indexOf('mega') > -1) {
       currentForm.sprite = id + '-mega.png';
     } else if (form.pokemon.name.indexOf('alola') > -1) {
-      currentForm.sprite = id + '-alola.png';
+      currentForm.sprite = id + '-alolan.png';
     }
     let formToAdd = {
       [currentForm.id]: currentForm
     }
+
     db.collection('alternateForms').doc(id).get().then(doc => {
-      if (!doc.exists) {
-        db.collection('alternateForms').doc(id).set(formToAdd, {
-          merge: true
-        });
-      console.log(form.pokemon.name + ' added successfully');        
-      }
+      db.collection('alternateForms').doc(id).set(formToAdd, {
+        merge: true
+      });
+      console.log(form.pokemon.name + ' added successfully');
     })
   })
 }

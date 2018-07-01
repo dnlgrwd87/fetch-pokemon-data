@@ -5,7 +5,6 @@ const firebase = require('firebase');
 // go through every move
 let pokemonRef = db.collection('pokemon');
 let pokeMovesRef = db.collection('pokemonMoves');
-let movesRef = db.collection('moves');
 let movesPokeRef = db.collection('movesPokemon');
 let pokemon = {};
 
@@ -16,7 +15,7 @@ pokeMovesRef.get().then(snap => {
     let pokeId = doc.id;
     let move = doc.data()[moveId];
     if (move) {
-      let currentPokemon = getCurrentPokemon(pokeId, move);
+      getCurrentPokemon(pokeId, move);
     }
   })
 })
