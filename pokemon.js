@@ -4,7 +4,7 @@ const axios = require("axios");
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
 
-for (let i = 39; i <= 75; i++) {
+for (let i = 781; i <= 802; i++) {
   db.collection('pokemon').doc(i.toString()).get().then(doc => {
     if (!doc.exists) {
     addPokemon(i);
