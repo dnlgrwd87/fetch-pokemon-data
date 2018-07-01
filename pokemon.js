@@ -4,7 +4,7 @@ const axios = require("axios");
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
 
-for (let i = 1; i <= 20; i++) {
+for (let i = 39; i <= 75; i++) {
   db.collection('pokemon').doc(i.toString()).get().then(doc => {
     if (!doc.exists) {
     addPokemon(i);
@@ -36,11 +36,11 @@ function addPokemon(id) {
         let evoUrl = data.evolution_chain.url;
         let evoId = evoUrl.slice(42, evoUrl.length - 1);
         newPokemon.name = data.name;
+        newPokemon.alternateForms = data.varieties.length > 1;
 
         axios.get("https://pokeapi.co/api/v2/evolution-chain/" + evoId).then(response => {
           let data = response.data;
           if (data.chain.evolves_to.length > 0) {
-
             newPokemon.evolutionId = data.id;
             if (data.chain.species.name != newPokemon.name) {
               let baseId = parseInt(
@@ -49,16 +49,14 @@ function addPokemon(id) {
               newPokemon.baseId = baseId;
             }
           }
+          axios.get("https://pokeapi.co/api/v2/pokemon/" + id).then(response => {
+            let data = response.data;
+            newPokemon.baseStats = getBaseStats(data.stats);
+            newPokemon.sprites = getSprites(data.sprites);
+            addPokemonToDatabase(newPokemon);
+            console.log('#' + newPokemon.id + " " + newPokemon.name + " added successfully!");
+          });
         })
-        newPokemon.alternateForms = data.varieties.length > 1;
-
-        axios.get("https://pokeapi.co/api/v2/pokemon/" + id).then(response => {
-          let data = response.data;
-          newPokemon.baseStats = getBaseStats(data.stats);
-          newPokemon.sprites = getSprites(data.sprites);
-          addPokemonToDatabase(newPokemon);
-          console.log('#' + newPokemon.id + " " + newPokemon.name + " added successfully!");
-        });
       })
     });
 }
