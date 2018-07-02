@@ -4,8 +4,9 @@ const url = "https://pokeapi.co/api/v2/evolution-chain/";
 
 let currentChain = {};
 
+// ALL ADDED TO FIRESTORE
 // 423 is the last evolution stage available
-for (let i = 1; i <= 9; i++) {
+for (let i = 301; i <= 423; i++) {
   axios.get(url + i).then(response => {
     let chain = response.data.chain;
     let chainId = response.data.id;
@@ -72,8 +73,6 @@ function getCurrentPokemon(evolution, details, previousId, previousName) {
 }
 
 function addChainToDatabase(chainToAdd, chainId) {
-  console.log("Chain id: " + chainId)
-  console.log(chainToAdd);
   currentChain = {};
   db.collection("evolutions")
     .doc(chainId.toString())

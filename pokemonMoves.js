@@ -1,13 +1,19 @@
 const db = require("./pokemon-firebase");
 const axios = require("axios");
 
-for (let i = 151; i <= 210; i++) {
+let fetechedMoves = [];
+let fetechedMovesIndex = [];
+let count = 0;
 
-  db.collection("pokemonMoves").doc(i.toString()).get().then(doc => {
-    // if (!doc.exists) {
-      getMove(i);
-    // }
-  })
+for (let i = 16; i <= 20; i++) {
+  // db.collection("pokemonMoves")
+  // .doc(i.toString())
+  // .get()
+  // .then(doc => {
+  // if (!doc.exists) {
+  getMove(i);
+  // }
+  // });
 }
 
 function getMove(i) {
@@ -20,19 +26,24 @@ function getMove(i) {
       };
       move.version_group_details.forEach(detail => {
         if (detail.version_group.name == "sun-moon") {
-          if (learnInfo.learnMethod.includes(detail.move_learn_method.name) == false) {
+          if (
+            learnInfo.learnMethod.includes(detail.move_learn_method.name) ==
+            false
+          ) {
             learnInfo.learnMethod.push(detail.move_learn_method.name);
           }
           learnInfo.learnLevel = detail.level_learned_at;
         }
-        if (detail.version_group.name == "omega-ruby-alpha-sapphire" && detail.move_learn_method.name == 'tutor') {
-          if (learnInfo.learnMethod.includes('tutor') == false) {
-            learnInfo.learnMethod.push('tutor');
+        if (
+          detail.version_group.name == "omega-ruby-alpha-sapphire" &&
+          detail.move_learn_method.name == "tutor"
+        ) {
+          if (learnInfo.learnMethod.includes("tutor") == false) {
+            learnInfo.learnMethod.push("tutor");
           }
         }
       });
       if (learnInfo.learnMethod.length > 0 && learnInfo.learnLevel != null) {
-        console.log(move.move.name + ' added!');
         addMove(move, learnInfo, i);
       }
     });
@@ -41,30 +52,48 @@ function getMove(i) {
 
 function addMove(move, learnInfo, i) {
   let url = move.move.url;
-  let moveId = url.slice(31, url.length - 1); // grabs move id from url string
-  db.collection("moves")
-    .doc(moveId)
-    .get()
-    .then(doc => {
-      let data = doc.data();
-      let currentMove = {
-        [moveId]: {
-          id: moveId,
-          name: data.name,
-          power: data.power,
-          shortEffectInfo: data.shortEffectInfo,
-          type: data.type,
-          accuracy: data.accuracy,
-          pp: data.pp,
-          category: data.category,
-          learnMethod: learnInfo.learnMethod,
-          learnLevel: learnInfo.learnLevel
-        }
-      };
-      db.collection("pokemonMoves")
-        .doc(i.toString())
-        .set(currentMove, {
-          merge: true
-        });
-    });
+  let moveId = url.slice(31, url.length - 1);
+  let currentMove = {};
+  let index = fetechedMovesIndex.indexOf(moveId);
+
+  if (index >= 0) {
+    currentMove = fetechedMoves[index];
+    count++;
+    console.log(count + " saves from calling database");
+    db.collection("pokemonMoves")
+      .doc(i.toString())
+      .set(currentMove, {
+        merge: true
+      });
+  } else {
+    db.collection("moves")
+      .doc(moveId)
+      .get()
+      .then(doc => {
+        let data = doc.data();
+        currentMove = {
+          [moveId]: {
+            id: parseInt(moveId),
+            name: data.name,
+            power: data.power,
+            shortEffectInfo: data.shortEffectInfo,
+            type: data.type,
+            accuracy: data.accuracy,
+            pp: data.pp,
+            category: data.category,
+            learnMethod: learnInfo.learnMethod,
+            learnLevel: learnInfo.learnLevel
+          }
+        };
+
+        fetechedMoves.push(currentMove);
+        fetechedMovesIndex.push(moveId);
+
+        db.collection("pokemonMoves")
+          .doc(i.toString())
+          .set(currentMove, {
+            merge: true
+          });
+      });
+  }
 }

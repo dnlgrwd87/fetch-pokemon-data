@@ -8,8 +8,8 @@ let eggMoves = [];
 // next to update is arbok
 
 db.collection("pokemon")
-  .where("baseId", ">", 3)
-  .limit(6)
+  .where("baseId", ">=", 10)
+  .where("baseId", "<=", 20)
   .get()
   .then(snap => {
     snap.docs.forEach(doc => {
