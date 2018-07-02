@@ -3,15 +3,16 @@ const axios = require("axios");
 
 let fetechedMoves = [];
 let fetechedMovesIndex = [];
-let count = 0;
+let savedCalls = 0;
 
-for (let i = 16; i <= 20; i++) {
+for (let i = 10; i <= 20; i++) {
+  getMove(i);
   // db.collection("pokemonMoves")
   // .doc(i.toString())
   // .get()
   // .then(doc => {
   // if (!doc.exists) {
-  getMove(i);
+  // getMove(i);
   // }
   // });
 }
@@ -19,25 +20,26 @@ for (let i = 16; i <= 20; i++) {
 function getMove(i) {
   axios.get("https://pokeapi.co/api/v2/pokemon/" + i).then(response => {
     let moves = response.data.moves;
+
     moves.forEach(move => {
+      let previousLearnLevel = 0;
       let learnInfo = {
         learnMethod: [],
         learnLevel: 0
       };
       move.version_group_details.forEach(detail => {
         if (detail.version_group.name == "sun-moon") {
-          if (
-            learnInfo.learnMethod.includes(detail.move_learn_method.name) ==
-            false
-          ) {
+          if (learnInfo.learnMethod.includes(detail.move_learn_method.name) == false) {
             learnInfo.learnMethod.push(detail.move_learn_method.name);
           }
-          learnInfo.learnLevel = detail.level_learned_at;
+          if (detail.level_learned_at > previousLearnLevel) {
+            previousLearnLevel = detail.level_learned_at;
+            learnInfo.learnLevel = detail.level_learned_at;
+          } else {
+            learnInfo.learnLevel = previousLearnLevel;
+          }
         }
-        if (
-          detail.version_group.name == "omega-ruby-alpha-sapphire" &&
-          detail.move_learn_method.name == "tutor"
-        ) {
+        if (detail.version_group.name == "omega-ruby-alpha-sapphire" && detail.move_learn_method.name == "tutor") {
           if (learnInfo.learnMethod.includes("tutor") == false) {
             learnInfo.learnMethod.push("tutor");
           }
@@ -57,9 +59,12 @@ function addMove(move, learnInfo, i) {
   let index = fetechedMovesIndex.indexOf(moveId);
 
   if (index >= 0) {
+    savedCalls++;
+    console.log(savedCalls + ' calls saved');
     currentMove = fetechedMoves[index];
-    count++;
-    console.log(count + " saves from calling database");
+    currentMove[moveId].learnMethod = learnInfo.learnMethod;
+    currentMove[moveId].learnLevel = learnInfo.learnLevel;
+
     db.collection("pokemonMoves")
       .doc(i.toString())
       .set(currentMove, {
@@ -80,14 +85,15 @@ function addMove(move, learnInfo, i) {
             type: data.type,
             accuracy: data.accuracy,
             pp: data.pp,
-            category: data.category,
-            learnMethod: learnInfo.learnMethod,
-            learnLevel: learnInfo.learnLevel
+            category: data.category
           }
         };
 
         fetechedMoves.push(currentMove);
         fetechedMovesIndex.push(moveId);
+
+        currentMove[moveId].learnMethod = learnInfo.learnMethod;
+        currentMove[moveId].learnLevel = learnInfo.learnLevel;
 
         db.collection("pokemonMoves")
           .doc(i.toString())

@@ -9,7 +9,7 @@ let eggMoves = [];
 
 db.collection("pokemon")
   .where("baseId", ">=", 10)
-  .where("baseId", "<=", 20)
+  .where("baseId", "<=", 19)
   .get()
   .then(snap => {
     snap.docs.forEach(doc => {
@@ -17,11 +17,10 @@ db.collection("pokemon")
       let baseId = data.baseId;
       let currentId = doc.id;
       if (baseId == prevBaseId) {
-        console.log(data.id + ' ' + data.name + ', ' + ' has the same base id as previous pokemon');
+        console.log(currentId + ' ' + data.name + ', ' + ' has the same base id as previous pokemon');
         transferEggMoves(eggMoves, currentId);
       } else {
-        eggMoves = [];
-        prevBaseId = baseId;
+
         console.log(currentId + ' ' + data.name + ' has a different id than the previous pokemon');
         db.collection("pokemonMoves")
           .doc(baseId.toString())
@@ -31,6 +30,8 @@ db.collection("pokemon")
               let moves = doc.data();
               copyEggMoves(moves);
               transferEggMoves(eggMoves, currentId);
+              eggMoves = [];
+              prevBaseId = baseId;
             }
           });
       }
@@ -64,12 +65,14 @@ function transferEggMoves(eggMoves, currentId) {
               .update({
                 [eggMove.id]: currentMove
               });
+            console.log(eggMove.name + ' egg move added');
           } else {
             db.collection("pokemonMoves")
               .doc(currentId)
               .update({
                 [eggMove.id]: eggMove
               });
+            console.log(eggMove.name + ' egg move added');
           }
         });
       }
