@@ -1,11 +1,14 @@
 const db = require("./pokemon-firebase");
 const axios = require("axios");
 
+// LAST ADDED WAS 250
+
+
 let fetechedMoves = [];
 let fetechedMovesIndex = [];
 let savedCalls = 0;
 
-for (let i = 1; i <= 9; i++) {
+for (let i = 451; i <= 500; i++) {
   getMove(i);
   // db.collection("pokemonMoves")
   // .doc(i.toString())

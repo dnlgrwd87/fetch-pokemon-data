@@ -28,6 +28,7 @@ function getCurrentPokemon(pokemonId, move) {
     let pokemon = {
       name: data.name,
       id: data.id,
+      sprite: data.sprite,
       types: Object.keys(data.types),
       abilities: {
         normal: data.abilities.normal,
