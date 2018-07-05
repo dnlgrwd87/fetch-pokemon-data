@@ -4,10 +4,10 @@ const axios = require("axios");
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
 
-for (let i = 1; i <= 1; i++) {
+for (let i = 51; i <= 52; i++) {
   db.collection('pokemon').doc(i.toString()).get().then(doc => {
     if (!doc.exists) {
-      addPokemon(8);
+      addPokemon(i);
     }
   })
 }

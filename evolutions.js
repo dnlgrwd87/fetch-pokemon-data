@@ -6,7 +6,7 @@ let currentChain = {};
 
 // ALL ADDED TO FIRESTORE
 // 423 is the last evolution stage available
-for (let i = 301; i <= 423; i++) {
+for (let i = 10; i <= 10; i++) {
   axios.get(url + i).then(response => {
     let chain = response.data.chain;
     let chainId = response.data.id;

@@ -1,13 +1,15 @@
 const db = require("./pokemon-firebase");
 const axios = require("axios");
 
-// LAST ADDED WAS BLASTOISE WITH BASE ID 7
+// LAST ADDED WAS BASE ID 355
+// GEN 1 COMPLETE
 
 let prevBaseId = 0;
 let eggMoves = [];
 
 db.collection("pokemon")
-  .where("baseId", "<=", 7)
+  .where("baseId", ">=", 301)
+  .where("baseId", "<=", 355)
   .get()
   .then(snap => {
     snap.docs.forEach(doc => {
@@ -58,12 +60,14 @@ function transferEggMoves(eggMoves, currentId) {
         eggMoves.forEach(eggMove => {
           if (moves.hasOwnProperty(eggMove.id)) {
             let currentMove = moves[eggMove.id];
-            currentMove.learnMethod.push("egg");
-            db.collection("pokemonMoves")
-              .doc(currentId)
-              .update({
-                [eggMove.id]: currentMove
-              });
+            if (currentMove.learnMethod.includes("egg") == false) {
+              currentMove.learnMethod.push("egg");
+              db.collection("pokemonMoves")
+                .doc(currentId)
+                .update({
+                  [eggMove.id]: currentMove
+                });
+            }
           } else {
             eggMove.learnMethod = ['egg']; // makes sure move is only copied as egg move if not already known
             db.collection("pokemonMoves")

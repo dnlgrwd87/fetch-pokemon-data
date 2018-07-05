@@ -6,12 +6,13 @@ const axios = require("axios");
 // NEED TO ADD 10026 - 10032, THESE FORMS NOT PRESENT IN BASTION API
 // ALSO 10061, (10080 - 10085, 10094 - 10099) ALL PIKACHU FORMS
 
-addPokemon(10147);
+addPokemon(10100);
 
 function addPokemon(id) {
   let newPokemon = {};
   newPokemon.evolutionId = null;
   newPokemon.baseId = null;
+  newPokemon.id = id;
 
   axios.get("https://pokeapi.co/api/v2/pokemon/" + id).then(response => {
     let data = response.data;
@@ -23,6 +24,7 @@ function addPokemon(id) {
       let data = response.data;
       let speciesId = data.id;
       newPokemon.alternateForms = true;
+      newPokemon.alternateId = speciesId;
 
       axios.get(data.evolution_chain.url).then(response => {
         let data = response.data;
@@ -43,7 +45,6 @@ function addPokemon(id) {
 
             if (data) {
               let bastionName = response.data[1].name;
-              newPokemon.id = speciesId;
               newPokemon.species = data.species.toLowerCase();
               newPokemon.types = getValues(data.types);
               newPokemon.height = data.height;

@@ -35,7 +35,7 @@ const axios = require("axios");
 
 // FOR ALTERNATE FORMS
 
-for (let i = 10001; i <= 10143; i++) {
+for (let i = 172; i <= 172; i++) {
   db.collection("pokemon").doc(i.toString())
     .get()
     .then(doc => {

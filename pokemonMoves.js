@@ -1,24 +1,22 @@
 const db = require("./pokemon-firebase");
 const axios = require("axios");
 
-// LAST ADDED WAS 250
+// ALL MOVES ADDED!
 
 
 let fetechedMoves = [];
 let fetechedMovesIndex = [];
 let savedCalls = 0;
 
-for (let i = 451; i <= 500; i++) {
-  getMove(i);
-  // db.collection("pokemonMoves")
-  // .doc(i.toString())
-  // .get()
-  // .then(doc => {
-  // if (!doc.exists) {
-  // getMove(i);
-  // }
-  // });
-}
+db.collection("pokemon")
+  .where("id", "==", 152)
+  // .where("id", "<=", 51)
+  .get()
+  .then(snap => {
+    snap.docs.forEach(doc => {
+      getMove(doc.id);
+    });
+  });
 
 function getMove(i) {
   axios.get("https://pokeapi.co/api/v2/pokemon/" + i).then(response => {
@@ -32,7 +30,10 @@ function getMove(i) {
       };
       move.version_group_details.forEach(detail => {
         if (detail.version_group.name == "sun-moon") {
-          if (learnInfo.learnMethod.includes(detail.move_learn_method.name) == false) {
+          if (
+            learnInfo.learnMethod.includes(detail.move_learn_method.name) ==
+            false
+          ) {
             learnInfo.learnMethod.push(detail.move_learn_method.name);
           }
           if (detail.level_learned_at > previousLearnLevel) {
@@ -42,7 +43,10 @@ function getMove(i) {
             learnInfo.learnLevel = previousLearnLevel;
           }
         }
-        if (detail.version_group.name == "omega-ruby-alpha-sapphire" && detail.move_learn_method.name == "tutor") {
+        if (
+          detail.version_group.name == "omega-ruby-alpha-sapphire" &&
+          detail.move_learn_method.name == "tutor"
+        ) {
           if (learnInfo.learnMethod.includes("tutor") == false) {
             learnInfo.learnMethod.push("tutor");
           }
@@ -63,7 +67,7 @@ function addMove(move, learnInfo, i) {
 
   if (index >= 0) {
     savedCalls++;
-    console.log(savedCalls + ' calls saved');
+    console.log(savedCalls + " calls saved");
     currentMove = fetechedMoves[index];
     currentMove[moveId].learnMethod = learnInfo.learnMethod;
     currentMove[moveId].learnLevel = learnInfo.learnLevel;
