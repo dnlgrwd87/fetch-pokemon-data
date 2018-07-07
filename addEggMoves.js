@@ -1,15 +1,14 @@
 const db = require("./pokemon-firebase");
 const axios = require("axios");
 
-// LAST ADDED WAS BASE ID 355
-// GEN 1 COMPLETE
+// ALL EGG MOVES DONE FOR NON ALTERNATE FORMS
 
 let prevBaseId = 0;
 let eggMoves = [];
 
 db.collection("pokemon")
-  .where("baseId", ">=", 301)
-  .where("baseId", "<=", 355)
+  .where("baseId", ">=", 712)
+  .where("baseId", "<=", 802)
   .get()
   .then(snap => {
     snap.docs.forEach(doc => {
@@ -24,13 +23,13 @@ db.collection("pokemon")
             let moves = doc.data();
             if (baseId == prevBaseId) {
               transferEggMoves(eggMoves, currentId)
-              console.log(data.name + ' has same id as previous pokemon, copying moves now');
+              console.log(data.name + ' has same base id as previous pokemon, copying moves now');
             } else {
               if (prevBaseId != 0) {
                 eggMoves = [];
                 console.log('egg moves cleared');
               }
-              console.log(data.name + ' does not have the same id as the previous pokemon, copying moves now');
+              console.log(data.name + ' does not have the same base id as the previous pokemon, copying moves now');
               copyEggMoves(moves);
               transferEggMoves(eggMoves, currentId);
             }

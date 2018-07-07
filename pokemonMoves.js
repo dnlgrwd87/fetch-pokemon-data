@@ -3,14 +3,13 @@ const axios = require("axios");
 
 // ALL MOVES ADDED!
 
-
 let fetechedMoves = [];
 let fetechedMovesIndex = [];
 let savedCalls = 0;
 
 db.collection("pokemon")
-  .where("id", "==", 152)
-  // .where("id", "<=", 51)
+  .where("id", ">=", 105)
+  .where("id", "<=", 105)
   .get()
   .then(snap => {
     snap.docs.forEach(doc => {
@@ -31,9 +30,7 @@ function getMove(i) {
       move.version_group_details.forEach(detail => {
         if (detail.version_group.name == "sun-moon") {
           if (
-            learnInfo.learnMethod.includes(detail.move_learn_method.name) ==
-            false
-          ) {
+            learnInfo.learnMethod.includes(detail.move_learn_method.name) == false ) {
             learnInfo.learnMethod.push(detail.move_learn_method.name);
           }
           if (detail.level_learned_at > previousLearnLevel) {
@@ -43,10 +40,7 @@ function getMove(i) {
             learnInfo.learnLevel = previousLearnLevel;
           }
         }
-        if (
-          detail.version_group.name == "omega-ruby-alpha-sapphire" &&
-          detail.move_learn_method.name == "tutor"
-        ) {
+        if (detail.version_group.name == "omega-ruby-alpha-sapphire" && detail.move_learn_method.name == "tutor") {
           if (learnInfo.learnMethod.includes("tutor") == false) {
             learnInfo.learnMethod.push("tutor");
           }
@@ -92,7 +86,9 @@ function addMove(move, learnInfo, i) {
             type: data.type,
             accuracy: data.accuracy,
             pp: data.pp,
-            category: data.category
+            category: data.category,
+            // learnMethod = learnInfo.learnMethod,
+            // learnLevel = learnInfo.learnLevel
           }
         };
 

@@ -4,12 +4,12 @@ const axios = require("axios");
 // normal: 1 - 802
 // alternate forms: 10001 - 10147
 
-for (let i = 51; i <= 52; i++) {
-  db.collection('pokemon').doc(i.toString()).get().then(doc => {
-    if (!doc.exists) {
-      addPokemon(i);
-    }
-  })
+for (let i = 52; i <= 151; i++) {
+  // db.collection('pokemon').doc(i.toString()).get().then(doc => {
+  // if (!doc.exists) {
+  addPokemon(i);
+  // }
+  // })
 }
 
 function addPokemon(id) {
@@ -57,7 +57,7 @@ function addPokemon(id) {
           });
         })
       })
-    });
+    })
 }
 
 function getBaseStats(stats) {
