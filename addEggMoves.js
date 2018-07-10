@@ -1,5 +1,4 @@
 const db = require("./pokemon-firebase");
-const axios = require("axios");
 
 // ALL EGG MOVES DONE FOR NON ALTERNATE FORMS
 
@@ -7,8 +6,8 @@ let prevBaseId = 0;
 let eggMoves = [];
 
 db.collection("pokemon")
-  .where("baseId", ">=", 712)
-  .where("baseId", "<=", 802)
+  .where("baseId", ">=", 173)
+  .where("baseId", "<=", 173)
   .get()
   .then(snap => {
     snap.docs.forEach(doc => {
